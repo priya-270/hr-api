@@ -1,6 +1,6 @@
 @Library('jhc') _
 pipeline {
-    agent any
+ line   agent any
 
     stages {
       
