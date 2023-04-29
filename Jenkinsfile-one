@@ -1,41 +1,27 @@
-@Library('jhc') _
 pipeline {
- line   agent any
-
+    agent any
 
     stages {
-       
-       
-       
-        stage('Git Checkout') {
-             when{
-                expression{
-                    params.branchName == "develop"
-                }
-            }
+        stage('gitchekout') {
             steps {
-                git branch: "${params.branchName}", credentialsId: 'github-tokens', url: 'https://github.com/javahometech/hr-api'
+                git branch: 'main', credentialsId: 'github-tokens', url: 'https://github.com/priya-270/hr-api'
             }
         }
         stage('Maven Build') {
-             when{
-                expression{
-                    params.branchName == "develop"
-                }
-            }
             steps {
                 sh 'mvn clean package'
             }
         }
-        stage('Tomcat Deploy - Dev') {
+        stage('Tomcat Deploy') {
             steps {
-                tomcatDeploy("ec2-user","172.31.82.238","tomcat-dev")
+               sshagent(['tomcat-dev']) {
+                   sh "scp target/hr-api.war ec2-user@172.31.32.245:/opt/jenkin-test/webapps/"
+                   sh "ssh ec2-user@172.31.32.245 /opt/jenkins-test/bin/shutdown.sh"
+                   sh "ssh ec2-user@172.31.32.245 /opt/jenkins-test/bin/startup.sh"
+                }
             }
         }
-    }
-    post {
-      always {
-        cleanWs()
-      }
+        
     }
 }
+    
