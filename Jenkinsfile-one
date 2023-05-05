@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('gitchekout') {
             steps {
-             echo "${params}"
+             echo "${params branchname}"
                 git branch: "{params.branchname}", credentialsId: 'github-tokens', url: 'https://github.com/priya-270/hr-api'
             }
         }
